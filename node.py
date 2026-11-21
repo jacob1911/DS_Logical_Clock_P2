@@ -1,5 +1,8 @@
 import random
 
+with open("jokes.txt", encoding="utf-8") as f:
+    JOKES = f.read().splitlines()
+
 Loglist = []
 
 class Node:
@@ -9,17 +12,17 @@ class Node:
         self.id = nodeid
 
     def GenerateMsg(self):
-        return random.choice(open("jokes.txt", "r").readline().split())
+        return random.choice(JOKES)
 
     def Log(self, msg):
-        Loglist.append([self.lamport_timestamp, self.vector_timestamp, msg])
+        Loglist.append([self.id, self.lamport_timestamp, tuple(self.vector_timestamp), msg])
         
     def Send(self, recv_node):
         self.lamport_timestamp += 1
         self.vector_timestamp[self.id] += 1
         msg = self.GenerateMsg()
-        recv_node.Receive(self.lamport_timestamp, self.vector_timestamp, msg)
         self.Log(f"sent: {msg}")
+        recv_node.Receive(self.lamport_timestamp, self.vector_timestamp, msg)
 
     def Receive(self, new_lamport, new_vector, msg):
         self.lamport_timestamp = max(new_lamport, self.lamport_timestamp) + 1
@@ -32,7 +35,11 @@ class Node:
         self.vector_timestamp[self.id] += 1
         self.Log(self.GenerateMsg())
         
+def simulation(N, steps, send_probability, seed):
+    random.seed(seed)
+    Loglist.clear()
+    Nodes = []
+    for n in range(N):
+        Nodes.append(Node(n, N))
 
-
-
-        
+    
