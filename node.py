@@ -42,4 +42,18 @@ def simulation(N, steps, send_probability, seed):
     for n in range(N):
         Nodes.append(Node(n, N))
 
+    for step in range(steps):
+        sender = random.choice(Nodes)
+        if random.random() < send_probability:
+            others = []
+            for n in Nodes:
+                if n is not sender:
+                    others.append(n)
+            receiver = random.choice(others)
+            sender.Send(receiver)
+        else:
+            sender.Event()
+
+    return list(Loglist)
+
     
